@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -13,6 +15,8 @@ func main() {
 
 	http.HandleFunc("/weather/", func(w http.ResponseWriter, r *http.Request) {
 		city := strings.SplitN(r.URL.Path, "/", 3)[2]
+
+		log.Printf("Request for city %v from %v", city, r.RemoteAddr)
 
 		data, err := query(city)
 		if err != nil {
@@ -39,8 +43,16 @@ type weatherData struct {
 }
 
 func query(city string) (weatherData, error) {
-	api_key, _ := os.LookupEnv("OPENWEATHER_API_KEY")
-	url := fmt.Sprintf("http://api.openweathermap.org/data/2.5/weather?APPID=%s&q=%s", api_key, city)
+	api_key, found := os.LookupEnv("OPENWEATHER_API_KEY")
+	if found != true {
+		msg := fmt.Sprintf("Could not find openweather api key")
+		log.Printf(msg)
+		return weatherData{}, errors.New(msg)
+	}
+	url := fmt.Sprintf(
+		"http://api.openweathermap.org/data/2.5/weather?APPID=%s&q=%s",
+		api_key, city)
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return weatherData{}, err
