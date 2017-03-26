@@ -11,20 +11,20 @@ import (
 )
 
 func main() {
-	openweather_key, found := os.LookupEnv("OPENWEATHER_API_KEY")
+	openweatherKey, found := os.LookupEnv("OPENWEATHER_API_KEY")
 	if found != true {
 		msg := fmt.Sprintf("Could not find openweather api key")
 		log.Fatal(msg)
 	}
-	wunderground_key, found := os.LookupEnv("WUNDERGROUND_API_KEY")
+	wundergroundKey, found := os.LookupEnv("WUNDERGROUND_API_KEY")
 	if found != true {
 		msg := fmt.Sprintf("Could not find wunderground api key")
 		log.Fatal(msg)
 	}
 
 	mw := multiWeatherProvider{
-		openWeatherMap{apiKey: openweather_key},
-		weatherUnderground{apiKey: wunderground_key},
+		openWeatherMap{apiKey: openweatherKey},
+		weatherUnderground{apiKey: wundergroundKey},
 	}
 
 	http.HandleFunc("/", hello)
@@ -56,7 +56,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("hello!"))
 }
 
-type openWeatherMap struct{
+type openWeatherMap struct {
 	apiKey string
 }
 
