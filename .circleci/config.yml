@@ -1,0 +1,28 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/go-weather
+    docker:
+      - image: circleci/golang:latest
+    steps:
+      - checkout
+      - run: echo "hello world"
+
+      - deploy:
+          name: Actual deploy commands
+          command: |
+            if [[ `echo $CIRCLE_TAG | grep -E "^[0-9]+.[0-9]+.[0-9]+$"` ]]
+              then echo real prod release command
+            elif [[ `echo $CIRCLE_TAG | grep -E "^[0-9]+.[0-9]+.[0-9]+\-rc[0-9]+$"` ]]
+              then echo real rc release command
+            fi
+
+deployment:
+  release:
+    tag: /^[0-9]+.[0-9]+.[0-9]+$/
+    commands:
+      - echo "in the deployment block for prod"
+  releaseRC:
+    tag: /^[0-9]+.[0-9]+.[0-9]+-rc[0-9]+$/
+    commands:
+      - echo "in the deployment block for rc"
